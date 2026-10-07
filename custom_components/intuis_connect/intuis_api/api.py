@@ -608,24 +608,25 @@ class IntuisAPI:
             mode: str,
             temp: float | None = None,
             duration: int | None = None,
+            fp: str | None = None,
     ) -> None:
-        """Send setstate command for one room."""
+        """Send setstate command for one room; ``fp`` sends a pilot-wire order instead of a temperature."""
         if self._debug:
             _LOGGER.debug(
-                "Setting room state for room %s: mode=%s, temp=%s, duration=%s",
+                "Setting room state for room %s: mode=%s, temp=%s, duration=%s, fp=%s",
                 room_id,
                 mode,
                 temp,
                 duration,
+                fp,
             )
         room_payload: dict[str, Any] = {"id": room_id, "therm_setpoint_mode": mode}
         if mode == "manual":
-            if temp is None:
-                raise APIError("Manual mode requires temperature")
+            if fp is None and temp is None:
+                raise APIError("Manual mode requires a temperature or a pilot-wire order")
             end = int(time.time()) + (duration or DEFAULT_MANUAL_DURATION) * 60
-            room_payload.update(
-                {"therm_setpoint_temperature": float(temp), "therm_setpoint_end_time": end}
-            )
+            setpoint = {"therm_setpoint_fp": fp} if fp is not None else {"therm_setpoint_temperature": float(temp)}
+            room_payload.update({**setpoint, "therm_setpoint_end_time": end})
         elif mode in ("away", "boost", "hg"):
             # These modes may also accept temperature and duration
             if temp is not None:

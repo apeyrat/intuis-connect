@@ -205,6 +205,7 @@ class IntuisData:
                             desired_mode,
                             float(desired_temp) if desired_temp is not None else None,
                             duration_min,
+                            **({"fp": override["fp"]} if override.get("fp") else {}),
                         )
                         # Update timestamps
                         self._overrides[room_id]["end"] = now_ts + duration_min * 60
