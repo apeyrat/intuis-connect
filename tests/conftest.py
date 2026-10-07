@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 import time
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 from typing import Any
 
 # Add the custom_components to the path
